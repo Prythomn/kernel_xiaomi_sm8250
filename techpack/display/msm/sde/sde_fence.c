@@ -205,7 +205,7 @@ static int _sde_fence_create_fd(void *fence_ctx, uint32_t val)
 
 	/* create fd */
 	fd = get_unused_fd_start_flags(1, 0);
-	if (fd < 0) {
+	if (unlikely(fd < 0)) {
 		dma_fence_put(&sde_fence->base);
 		goto exit;
 	}
