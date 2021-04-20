@@ -8927,7 +8927,7 @@ int can_migrate_task(struct task_struct *p, struct lb_env *env)
 	if (!can_migrate_boosted_task(p, env->src_cpu, env->dst_cpu))
 	
 	/* Disregard pcpu kthreads; they are where they need to be. */
-	if ((p->flags & PF_KTHREAD) && kthread_is_per_cpu(p))
+	if (kthread_is_per_cpu(p))
 		return 0;
 
 	if (!cpumask_test_cpu(env->dst_cpu, p->cpus_ptr)) {
