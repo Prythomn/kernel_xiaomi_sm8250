@@ -35,6 +35,10 @@ struct cass_cpu_cand {
 	unsigned long util;
 };
 
+unsigned int sched_util_threshold[NR_CPUS] = {
+	646, 646, 646, 646, 500, 500, 500, 404
+};
+
 static __always_inline
 void cass_cpu_util(struct cass_cpu_cand *c, int this_cpu)
 {
@@ -98,6 +102,12 @@ bool cass_cpu_better(const struct cass_cpu_cand *a,
 	    cass_cmp(b->eff_util * SCHED_CAPACITY_SCALE / b->cap_max,
 		     a->eff_util * SCHED_CAPACITY_SCALE / a->cap_max))
 		goto done;
+		
+	/* Prefer the CPU with lower orig capacity when util is low */
+	if((a->util <= sched_util_threshold[a->cpu] &&
+	    b->util <= sched_util_threshold[b->cpu]) &&
+	    cass_cmp(capacity_orig_of(b->cpu), capacity_orig_of(a->cpu)))
+                goto done;
 
 	/* Prefer the CPU that isn't the single fastest one in the system */
 	if (cass_cmp(cass_prime_cpu(b), cass_prime_cpu(a)))
