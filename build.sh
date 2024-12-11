@@ -16,7 +16,7 @@ MAINPATH=/home/timisong # измените, если необходимо
 KERNEL_DIR=$MAINPATH/kernel
 KERNEL_PATH=$KERNEL_DIR/kernel_xiaomi_sm8250
 
-git log $LAST..HEAD > ../log.txt
+git log $LAST..HEAD --format=oneline > ../changelog.txt
 BRANCH=$(git branch --show-current)
 
 # Каталоги компиляторов
@@ -119,7 +119,7 @@ make O="$output_dir" \
                 STRIP=llvm-strip \
                 LLVM=1 \
                 LLVM_IAS=1 \
-                V=$VERBOSE 2>&1 | tee error.log
+                V=$VERBOSE 2>&1 | tee build.log
                 
 
 # Предполагается, что переменная DTS установлена ранее в скрипте
@@ -144,7 +144,11 @@ if grep -q -E "Ошибка 2|Error 2" error.log; then
     -d message_thread_id="38153"
 
     curl -s -X POST "https://api.telegram.org/bot$TGTOKEN/sendDocument?chat_id=@magictimekernel" \
-    -F document=@"./error.log" \
+    -F document=@"./build.log" \
+    -F message_thread_id="38153"
+
+    curl -s -X POST "https://api.telegram.org/bot$TGTOKEN/sendDocument?chat_id=@magictimekernel" \
+    -F document=@"../changelog.txt" \
     -F message_thread_id="38153"
 else
     echo "Общее время выполнения: $elapsed_time секунд"
@@ -159,11 +163,11 @@ else
 
     curl -s -X POST "https://api.telegram.org/bot$TGTOKEN/sendDocument?chat_id=@magictimekernel" \
     -F document=@"./MagicTime-$MODEL-$MAGIC_BUILD_DATE.zip" \
-    -F caption="MagicTime ${VERSION}${PREFIX}${BUILD} (${BUILD_TYPE})" \
+    -F caption="MagicTime ${VERSION}${PREFIX}${BUILD} (${BUILD_TYPE}) branch: ${BRANCH}" \
     -F message_thread_id="38153"
     
     curl -s -X POST "https://api.telegram.org/bot$TGTOKEN/sendDocument?chat_id=@magictimekernel" \
-    -F document=@"../log.txt" \
+    -F document=@"../changelog.txt" \
     -F caption="Latest changes" \
     -F message_thread_id="38153"
 
