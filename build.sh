@@ -134,7 +134,7 @@ elapsed_time=$((end_time - start_time))
 cd "$KERNEL_PATH"
 
 # Проверка успешности сборки
-if grep -q -E "Ошибка 2|Error 2" error.log; then
+if grep -q -E "Ошибка 2|Error 2" build.log; then
     cd "$KERNEL_PATH"
     echo "Ошибка: Сборка завершилась с ошибкой"
 
