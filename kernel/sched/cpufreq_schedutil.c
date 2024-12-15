@@ -815,19 +815,6 @@ static void sugov_clear_global_tunables(void)
 		global_tunables = NULL;
 }
 
-static void sugov_tunables_restore(struct cpufreq_policy *policy)
-{
-	struct sugov_policy *sg_policy = policy->governor_data;
-	struct sugov_tunables *tunables = sg_policy->tunables;
-	struct sugov_tunables *cached = per_cpu(cached_tunables, policy->cpu);
-
-	if (!cached)
-		return;
-
-	tunables->up_rate_limit_us = cached->up_rate_limit_us;
-	tunables->down_rate_limit_us = cached->down_rate_limit_us;
-}
-
 static int sugov_init(struct cpufreq_policy *policy)
 {
 	struct sugov_policy *sg_policy;
