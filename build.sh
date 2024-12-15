@@ -16,7 +16,7 @@ MAINPATH=/home/timisong # измените, если необходимо
 KERNEL_DIR=$MAINPATH/kernel
 KERNEL_PATH=$KERNEL_DIR/kernel_xiaomi_sm8250
 
-git log $LAST..HEAD --format=oneline > ../changelog.txt
+git log $LAST..HEAD > ../changelog.txt
 BRANCH=$(git branch --show-current)
 
 # Каталоги компиляторов
@@ -102,7 +102,7 @@ output_dir=out
 
 # Конфигурация ядра
 make O="$output_dir" \
-            alioth_defconfig \
+            ${DEVICE}_defconfig \
             vendor/xiaomi/sm8250-common.config
 
     # Компиляция ядра
@@ -154,7 +154,7 @@ else
     echo "Общее время выполнения: $elapsed_time секунд"
     # Перемещение в каталог MagicTime и создание архива
     cd "$MAGIC_TIME_DIR"
-    7z a -mx9 MagicTime-$MODEL-$MAGIC_BUILD_DATE.zip * -x!*.zip
+    7z a -mx9 MagicTime-$DEVICE-$MAGIC_BUILD_DATE.zip * -x!*.zip
     
     curl -s -X POST https://api.telegram.org/bot$TGTOKEN/sendMessage \
     -d chat_id="@magictimekernel" \
@@ -162,7 +162,7 @@ else
     -d message_thread_id="38153"
 
     curl -s -X POST "https://api.telegram.org/bot$TGTOKEN/sendDocument?chat_id=@magictimekernel" \
-    -F document=@"./MagicTime-$MODEL-$MAGIC_BUILD_DATE.zip" \
+    -F document=@"./MagicTime-$DEVICE-$MAGIC_BUILD_DATE.zip" \
     -F caption="MagicTime ${VERSION}${PREFIX}${BUILD} (${BUILD_TYPE}) branch: ${BRANCH}" \
     -F message_thread_id="38153"
     
@@ -171,7 +171,7 @@ else
     -F caption="Latest changes" \
     -F message_thread_id="38153"
 
-    rm -rf MagicTime-$MODEL-$MAGIC_BUILD_DATE.zip
+    rm -rf MagicTime-$DEVICE-$MAGIC_BUILD_DATE.zip
 
     BUILD=$((BUILD + 1))
 
