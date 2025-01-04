@@ -10,10 +10,10 @@ start_time=$(date +%s)
 rm -rf out
 
 # Основной каталог
-MAINPATH=/home/timisong # измените, если необходимо
+MAINPATH=/workspaces # измените, если необходимо
 
 # Каталог ядра
-KERNEL_DIR=$MAINPATH/kernel
+KERNEL_DIR=$MAINPATH
 KERNEL_PATH=$KERNEL_DIR/kernel_xiaomi_sm8250
 
 git log $LAST..HEAD > ../changelog.txt
@@ -25,33 +25,32 @@ ANDROID_PREBUILTS_GCC_ARM_DIR=$KERNEL_DIR/android_prebuilts_gcc_linux-x86_arm_ar
 ANDROID_PREBUILTS_GCC_AARCH64_DIR=$KERNEL_DIR/android_prebuilts_gcc_linux-x86_aarch64_aarch64-linux-android-4.9
 
 # Проверка и клонирование, если необходимо
-check_and_clone() {
-    local dir=$1
-    local repo=$2
 
-    if [ ! -d "$dir" ]; then
-        echo "Папка $dir не существует. Клонирование $repo."
-        git clone $repo $dir
-    fi
-}
+   
+  
 
-check_and_wget() {
-    local dir=$1
-    local repo=$2
+  
 
-    if [ ! -d "$dir" ]; then
-        echo "Папка $dir не существует. Клонирование $repo."
-        mkdir $dir
-        cd $dir
-        wget $repo
-        tar -zxvf Clang-20.0.0git-20241222.tar.gz
-        rm -rf Clang-20.0.0git-20241222.tar.gz
-        cd ../kernel_xiaomi_sm8250
-    fi
-}
+
+
+
+
+
+    
+
+
+
+
+    
+    
+  
+       
+
+
+
 
 # Клонирование инструментов компиляции, если они не существуют
-check_and_wget $CLANG_DIR https://github.com/ZyCromerZ/Clang/releases/download/20.0.0git-20241222-release/Clang-20.0.0git-20241222.tar.gz
+
 check_and_clone $ANDROID_PREBUILTS_GCC_ARM_DIR https://github.com/LineageOS/android_prebuilts_gcc_linux-x86_arm_arm-linux-androideabi-4.9
 check_and_clone $ANDROID_PREBUILTS_GCC_AARCH64_DIR https://github.com/LineageOS/android_prebuilts_gcc_linux-x86_aarch64_aarch64-linux-android-4.9
 
@@ -69,7 +68,7 @@ if [ ! -d "$MAGIC_TIME_DIR" ]; then
     
     # Проверка и клонирование Anykernel, если MagicTime не существует
     if [ ! -d "$MAGIC_TIME_DIR/Anykernel" ]; then
-        git clone https://github.com/TIMISONG-dev/Anykernel.git "$MAGIC_TIME_DIR/Anykernel"
+        git clone https://github.com/Prythomn/Anykernel.git "$MAGIC_TIME_DIR/Anykernel"
         
         # Перемещение всех файлов из Anykernel в MagicTime
         mv "$MAGIC_TIME_DIR/Anykernel/"* "$MAGIC_TIME_DIR/"
@@ -102,7 +101,7 @@ output_dir=out
 
 # Конфигурация ядра
 make O="$output_dir" \
-            ${DEVICE}_defconfig \
+            munch_defconfig \
             vendor/xiaomi/sm8250-common.config
 
     # Компиляция ядра
@@ -171,7 +170,7 @@ else
     -F caption="Latest changes" \
     -F message_thread_id="38153"
 
-    rm -rf MagicTime-$DEVICE-$MAGIC_BUILD_DATE.zip
+   
 
     BUILD=$((BUILD + 1))
 
