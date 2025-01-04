@@ -10,10 +10,10 @@ start_time=$(date +%s)
 rm -rf out
 
 # Основной каталог
-MAINPATH=/home/timisong # измените, если необходимо
+MAINPATH=/workspaces # измените, если необходимо
 
 # Каталог ядра
-KERNEL_DIR=$MAINPATH/kernel
+KERNEL_DIR=$MAINPATH
 KERNEL_PATH=$KERNEL_DIR/kernel_xiaomi_sm8250
 
 git log $LAST..HEAD > ../changelog.txt
@@ -69,7 +69,7 @@ if [ ! -d "$MAGIC_TIME_DIR" ]; then
     
     # Проверка и клонирование Anykernel, если MagicTime не существует
     if [ ! -d "$MAGIC_TIME_DIR/Anykernel" ]; then
-        git clone https://github.com/TIMISONG-dev/Anykernel.git "$MAGIC_TIME_DIR/Anykernel"
+        git clone https://github.com/Prythomn/Anykernel.git "$MAGIC_TIME_DIR/Anykernel"
         
         # Перемещение всех файлов из Anykernel в MagicTime
         mv "$MAGIC_TIME_DIR/Anykernel/"* "$MAGIC_TIME_DIR/"
@@ -90,9 +90,9 @@ export DTBPATH="$MAGIC_TIME_DIR/dtb"
 export DTBOPATH="$MAGIC_TIME_DIR/dtbo.img"
 export CROSS_COMPILE="aarch64-linux-gnu-"
 export CROSS_COMPILE_COMPAT="arm-linux-gnueabi-"
-export KBUILD_BUILD_USER="TIMISONG"
-export KBUILD_BUILD_HOST="timisong-dev"
-export MODEL="alioth"
+export KBUILD_BUILD_USER="Olzhas"
+export KBUILD_BUILD_HOST="testing"
+export MODEL="munch"
 
 # Запись времени сборки
 MAGIC_BUILD_DATE=$(date '+%Y-%m-%d_%H-%M-%S')
@@ -102,7 +102,7 @@ output_dir=out
 
 # Конфигурация ядра
 make O="$output_dir" \
-            ${DEVICE}_defconfig \
+            munch_defconfig \
             vendor/xiaomi/sm8250-common.config
 
     # Компиляция ядра
@@ -138,40 +138,10 @@ if grep -q -E "Ошибка 2|Error 2" build.log; then
     cd "$KERNEL_PATH"
     echo "Ошибка: Сборка завершилась с ошибкой"
 
-    curl -s -X POST https://api.telegram.org/bot$TGTOKEN/sendMessage \
-    -d chat_id="@magictimekernel" \
-    -d text="Ошибка в компиляции!" \
-    -d message_thread_id="38153"
-
-    curl -s -X POST "https://api.telegram.org/bot$TGTOKEN/sendDocument?chat_id=@magictimekernel" \
-    -F document=@"./build.log" \
-    -F message_thread_id="38153"
-
-    curl -s -X POST "https://api.telegram.org/bot$TGTOKEN/sendDocument?chat_id=@magictimekernel" \
-    -F document=@"../changelog.txt" \
-    -F message_thread_id="38153"
-else
     echo "Общее время выполнения: $elapsed_time секунд"
     # Перемещение в каталог MagicTime и создание архива
     cd "$MAGIC_TIME_DIR"
     7z a -mx9 MagicTime-$DEVICE-$MAGIC_BUILD_DATE.zip * -x!*.zip
-    
-    curl -s -X POST https://api.telegram.org/bot$TGTOKEN/sendMessage \
-    -d chat_id="@magictimekernel" \
-    -d text="Компиляция завершилась успешно! Время выполнения: $elapsed_time секунд" \
-    -d message_thread_id="38153"
-
-    curl -s -X POST "https://api.telegram.org/bot$TGTOKEN/sendDocument?chat_id=@magictimekernel" \
-    -F document=@"./MagicTime-$DEVICE-$MAGIC_BUILD_DATE.zip" \
-    -F caption="MagicTime ${VERSION}${PREFIX}${BUILD} (${BUILD_TYPE}) branch: ${BRANCH}" \
-    -F message_thread_id="38153"
-    
-    curl -s -X POST "https://api.telegram.org/bot$TGTOKEN/sendDocument?chat_id=@magictimekernel" \
-    -F document=@"../changelog.txt" \
-    -F caption="Latest changes" \
-    -F message_thread_id="38153"
-
-    rm -rf MagicTime-$DEVICE-$MAGIC_BUILD_DATE.zip
 
     BUILD=$((BUILD + 1))
 
