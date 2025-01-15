@@ -72,9 +72,8 @@ void cass_cpu_util(struct cass_cpu_cand *c, int this_cpu)
 static __always_inline
 bool cass_cpu_better(const struct cass_cpu_cand *a,
 		     const struct cass_cpu_cand *b,
-		     int prev_cpu, bool sync,  struct task_struct *p)
+		     int this_cpu, int prev_cpu)
 {
-#define cass_cmp_r(a, b, c) ({ res = ((a) - (b)) * (abs((a) - (b)) > (c)); })
 #define cass_cmp(a, b) ({ res = (a) - (b); })
 #define cass_eq(a, b) ({ res = (a) == (b); })
 	long res;
@@ -97,6 +96,10 @@ bool cass_cpu_better(const struct cass_cpu_cand *a,
 	if(low_util && !boosted && cass_cmp(capacity_orig_of(b->cpu),
 					    capacity_orig_of(a->cpu)))
                 goto done;
+
+	/* Prefer the CPU that isn't the single fastest one in the system */
+	if (cass_cmp(cass_prime_cpu(b), cass_prime_cpu(a)))
+		goto done;
 
 	/* Prefer the CPU with lower relative utilization */
 	if (cass_cmp_r(b->util, a->util, 128))

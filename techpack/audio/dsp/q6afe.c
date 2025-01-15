@@ -446,8 +446,8 @@ static int q6afe_load_avcs_modules(int num_modules, u16 port_id,
 				if (format_id == ASM_MEDIA_FMT_APTX_ADAPTIVE) {
 					pm[i]->payload->load_unload_info[0].id1 =
 						AVS_MODULE_ID_DEPACKETIZER_COP;
-                                        goto load_unload;
-                                }
+					goto load_unload;
+				}
 
 				if (format_id == ENC_CODEC_TYPE_LHDC) {
 					pm[i]->payload->load_unload_info[0].id1 =
@@ -538,7 +538,6 @@ struct afe_cspl_state cspl_afe = {
 };
 EXPORT_SYMBOL(cspl_afe);
 #endif
-
 int afe_get_spk_initial_cal(void)
 {
 	return this_afe.initial_cal;

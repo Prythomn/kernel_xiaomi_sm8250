@@ -235,8 +235,6 @@ int irq_do_set_affinity(struct irq_data *data, const struct cpumask *mask,
 	if (!chip || !chip->irq_set_affinity)
 		return -EINVAL;
 
-	/* IRQs only run on the first CPU in the affinity mask; reflect that */
-	mask = cpumask_of(cpumask_first(mask));
 	ret = chip->irq_set_affinity(data, mask, force);
 	switch (ret) {
 	case IRQ_SET_MASK_OK:
@@ -435,8 +433,6 @@ irq_set_affinity_notifier(unsigned int irq, struct irq_affinity_notify *notify)
 	raw_spin_unlock_irqrestore(&desc->lock, flags);
 
 	if (old_notify) {
-		if (notify)
-			WARN(1, "overwriting previous IRQ affinity notifier\n");
 		if (cancel_work_sync(&old_notify->work)) {
 			/* Pending work had a ref, put that one too */
 			kref_put(&old_notify->kref, old_notify->release);
